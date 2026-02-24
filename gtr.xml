@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-<ModulePrefs title="-" />
-<Content type="html"><![CDATA[
-
-<?xml version="1.0" encoding="UTF-8" ?>
-<Module>
 <ModulePrefs title="Google.com" />
 <Content type="html"><![CDATA[
 
@@ -368,10 +363,6 @@ document.head.appendChild(window.playgamaScript);
   </body>
 </html>
 
-
-
-]]></Content>
-</Module>
 
 
 ]]></Content>
