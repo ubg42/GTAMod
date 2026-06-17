@@ -4,45 +4,18 @@
     <meta charset="utf-8"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-    <title>google.com</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/style.css"/>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/Web Audio Plugin/howler.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/Web Audio Plugin/WebAudio.js"></script>
-    <script type="text/javascript">
-        window.SDK_OPTIONS = {
-            gameId: "jp112o3o4hzgrnc7zaewjkrfk282pul8",
-            onEvent: function (a) {
-                switch (a.name) {
-                    case "SDK_GAME_PAUSE":
-                        console.log("Oyun duraklatıldı, ses kapatılıyor...");
-                        if (typeof myGameInstance !== 'undefined' && myGameInstance) {
-                            myGameInstance.SendMessage('AudioManager', 'MuteAudio');
-                        }
-                        break;
-                    case "SDK_GAME_START":
-                        console.log("Reklam bitti, oyun devam ediyor...");
-                        if (typeof myGameInstance !== 'undefined' && myGameInstance) {
-                            myGameInstance.SendMessage('AudioManager', 'UnmuteAudio');
-                        }
-                        break;
-                    case "SDK_READY":
-                        console.log("SDK hazır.");
-                        break;
-                }
-            }
-        };
-        (function (a, b, c) {
-            var d = a.getElementsByTagName(b)[0];
-            a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js", d.parentNode.insertBefore(a, d));
-        })(document, "script", "gamemonetize-sdk");
-    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/centerclassroom/mc55@main/style.css"/>
     <style>
+        /* Убираем выделение по нажатию клавиш */
         canvas:focus {
             outline: none;
         }
+
         html, body {
+            /* Убираем отступы */
             padding: 0;
             margin: 0;
+            /* Отключаем скролл и лонгтап на IOS */
             overflow: hidden;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -51,76 +24,37 @@
             -ms-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: rgba(0,0,0,0);
+            /* Ставим высоту на 100% */
             height: 100%;
         }
     </style>
 </head>
-<body class="dark">b
+<body class="light">
     <div id="unity-container" class="unity-desktop">
         <canvas id="unity-canvas" tabindex="-1"></canvas>
     </div>
     <div id="loading-cover" style="display:none;">
         <div id="unity-loading-bar">
-            <div id="unity-logo"><img src="https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/logo.png"/></div>
             <div id="unity-progress-bar-empty" style="display: none;">
                 <div id="unity-progress-bar-full"></div>
             </div>
             <div class="spinner"></div>
         </div>
     </div>
+    <!-- Additional body modules -->
     <script>
         const hideFullScreenButton = "";
-        const buildUrl = "https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/Build";
-
-        const dataParts = [
-            "FameGame.data.gz.part000.gz",
-            "FameGame.data.gz.part001.gz",
-            "FameGame.data.gz.part002.gz"
-        ].map(part => buildUrl + "/" + part);
-
-        const wasmParts = [
-            "FameGame.wasm.gz.part000.gz",
-            "FameGame.wasm.gz.part001.gz",
-            "FameGame.wasm.gz.part002.gz",
-            "FameGame.wasm.gz.part003.gz"
-        ].map(part => buildUrl + "/" + part);
-
-        async function combineParts(parts) {
-            try {
-                const buffers = await Promise.all(
-                    parts.map(part =>
-                        fetch(part).then(response => {
-                            if (!response.ok) throw new Error(`Failed to load ${part}`);
-                            return response.arrayBuffer();
-                        })
-                    )
-                );
-                const totalSize = buffers.reduce((sum, buffer) => sum + buffer.byteLength, 0);
-                const combinedArray = new Uint8Array(totalSize);
-                let offset = 0;
-                for (const buffer of buffers) {
-                    combinedArray.set(new Uint8Array(buffer), offset);
-                    offset += buffer.byteLength;
-                }
-                const blob = new Blob([combinedArray], { type: 'application/octet-stream' });
-                return URL.createObjectURL(blob);
-            } catch (error) {
-                console.error("Part birleştirme hatası:", error);
-                throw error;
-            }
-        }
-
+        const buildUrl = "https://cdn.jsdelivr.net/gh/centerclassroom/mc55@main/Build";
+        const loaderUrl = buildUrl + "/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js";
         const config = {
-            dataUrl: "",
-            frameworkUrl: buildUrl + "/FameGame.framework.js",
-            codeUrl: "",
-            streamingAssetsUrl: "https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/StreamingAssets",
+            dataUrl: buildUrl + "/cffd2fddc93a5e3bb5ff56ac3bb5a297.data.br",
+            frameworkUrl: buildUrl + "/c39bf58f300a834e953a20c745c5e5f2.framework.js",
+            codeUrl: buildUrl + "/d649f30ffe591eef6765ee27d7fc980f.wasm.br",
+            streamingAssetsUrl: "StreamingAssets",
             companyName: "DefaultCompany",
-            productName: "HZ",
+            productName: "GtaArcade",
             productVersion: "0.1"
         };
-
-        const loaderUrl = buildUrl + "/FameGame.loader.js";
 
         const container = document.querySelector("#unity-container");
         const canvas = document.querySelector("#unity-canvas");
@@ -129,23 +63,26 @@
         const progressBarFull = document.querySelector("#unity-progress-bar-full");
         const spinner = document.querySelector('.spinner');
 
-        let isAdShown = false;
-
-        function showAdOnClick() {
-            if (!isAdShown && typeof sdk !== 'undefined' && typeof sdk.showBanner !== 'undefined') {
-                sdk.showBanner();
-                isAdShown = true;
-                console.log("Reklam çağrıldı.");
-            } else {
-                console.warn("SDK veya showBanner tanımlı değil.");
+        const canFullscreen = (function () {
+            for (const key of [
+                'exitFullscreen',
+                'webkitExitFullscreen',
+                'webkitCancelFullScreen',
+                'mozCancelFullScreen',
+                'msExitFullscreen',
+            ]) {
+                if (key in document) {
+                    return true;
+                }
             }
-        }
+            return false;
+        }());
 
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             container.className = "unity-mobile";
         }
 
-        loadingCover.style.background = "url('https://cdn.jsdelivr.net/gh/classrooms-1/ohanganamaranes@main/background.png') center / cover";
+        loadingCover.style.background = "url('background.png') center / cover";
         loadingCover.style.display = "";
 
         document.addEventListener('contextmenu', event => event.preventDefault());
@@ -160,7 +97,7 @@
 
         let StartUnityInstance;
         let myGameInstance;
-        let ysdk = null;
+        let ysdk = null; // Yandex SDK pasif
 
         let environmentData = {
             language: "en",
@@ -198,7 +135,6 @@
         let nowFullAdOpen = false;
 
         function GetPayments() { console.warn("GetPayments is not implemented"); return Promise.resolve("none"); }
-        function BuyPayments() { console.warn("GetPayments is not implemented"); return Promise.resolve("none"); }
         function SaveCloud() { console.warn("SaveCloud is not implemented"); }
         function LoadCloud() { console.warn("LoadCloud is not implemented"); return Promise.resolve("noData"); }
         function InitPlayer() { console.warn("InitPlayer is not implemented"); return Promise.resolve("noData"); }
@@ -239,36 +175,82 @@
         function GetLeaderboardScores() { console.warn("GetLeaderboardScores is not implemented"); }
         function SetLeaderboardScores() { console.warn("SetLeaderboardScores is not implemented"); }
         function ConsumePurchase() { console.warn("ConsumePurchase is not implemented"); }
-        function ConsumePurchases() { console.warn("ConsumePurchases is not implemented"); }
+        function flasgsData() { console.warn("ConsumePurchases is not implemented"); }
 
+        // Dosya birleştirme fonksiyonu
+        async function mergeFileParts(fileUrl, partCount) {
+            try {
+                const parts = [];
+                for (let i = 0; i < partCount; i++) {
+                    const partUrl = `${fileUrl}.part${i}`;
+                    const response = await fetch(partUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch part ${partUrl}: ${response.statusText}`);
+                    }
+                    const part = await response.arrayBuffer();
+                    parts.push(part);
+                }
+
+                // Tüm parçaları birleştir
+                const totalSize = parts.reduce((sum, part) => sum + part.byteLength, 0);
+                const merged = new Uint8Array(totalSize);
+                let offset = 0;
+                for (const part of parts) {
+                    merged.set(new Uint8Array(part), offset);
+                    offset += part.byteLength;
+                }
+
+                // Birleştirilmiş dosyayı Blob olarak döndür
+                const blob = new Blob([merged], { type: 'application/octet-stream' });
+                return URL.createObjectURL(blob);
+            } catch (error) {
+                console.error(`Error merging file ${fileUrl}:`, error);
+                throw error;
+            }
+        }
+
+        // Unity yapılandırmasını güncelleyen fonksiyon
+        async function prepareUnityConfig(config) {
+            try {
+                // .data.br dosyası için parçaları birleştir
+                const dataPartsCount = 4; // cffd2fddc93a5e3bb5ff56ac3bb5a297.data.br için 4 parça
+                config.dataUrl = await mergeFileParts(buildUrl + "/cffd2fddc93a5e3bb5ff56ac3bb5a297.data.br", dataPartsCount);
+
+                // .wasm.br dosyası için parçaları birleştir
+                const wasmPartsCount = 4; // d649f30ffe591eef6765ee27d7fc980f.wasm.br için 4 parça
+                config.codeUrl = await mergeFileParts(buildUrl + "/d649f30ffe591eef6765ee27d7fc980f.wasm.br", wasmPartsCount);
+
+                return config;
+            } catch (error) {
+                console.error("Error preparing Unity config:", error);
+                throw error;
+            }
+        }
+
+        // Unity başlatma işlemi
         try {
             const script = document.createElement("script");
             script.src = loaderUrl;
             script.onload = async () => {
                 try {
-                    config.dataUrl = await combineParts(dataParts);
-                    config.codeUrl = await combineParts(wasmParts);
+                    // Yapılandırmayı hazırla (parçaları birleştir)
+                    const updatedConfig = await prepareUnityConfig({ ...config });
+
                     StartUnityInstance = function () {
-                        createUnityInstance(canvas, config, (progress) => {
+                        createUnityInstance(canvas, updatedConfig, (progress) => {
                             spinner.style.display = "none";
                             progressBarEmpty.style.display = "";
                             progressBarFull.style.width = `${100 * progress}%`;
                         }).then((unityInstance) => {
                             myGameInstance = unityInstance;
                             loadingCover.style.display = "none";
-                            // Oyun yüklendiğinde tıklama olayını ekle
-                            canvas.addEventListener('pointerdown', showAdOnClick);
-                            canvas.addEventListener('touchstart', showAdOnClick);
-                            // Blob URL'leri temizle
-                            URL.revokeObjectURL(config.dataUrl);
-                            URL.revokeObjectURL(config.codeUrl);
                         }).catch((message) => {
                             console.error("Unity yükleme hatası:", message);
                         });
                     };
                     StartUnityInstance();
                 } catch (error) {
-                    console.error("Part birleştirme sırasında hata:", error);
+                    console.error("Unity başlatma sırasında hata:", error);
                 }
             };
             document.body.appendChild(script);
@@ -293,7 +275,7 @@
             event.preventDefault();
         });
     </script>
-
+	
 <!-- Sticky Bottom Center Ad (728x90) with Smooth Slide-Out and Reappearance -->
 <style>
   /* Container: Bottom center, fixed, with overflow hidden */
